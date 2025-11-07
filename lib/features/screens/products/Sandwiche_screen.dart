@@ -41,7 +41,7 @@ class _SandwichesScreenState extends State<SandwichesScreen> {
       });
 
       List<GeneralModels.ProductModel> productos =
-          await _apiService.obtenerProductosPorCategoriaId(8);
+          await _apiService.obtenerProductosPorCategoriaId(7);
 
       if (mounted) {
         setState(() {
@@ -92,7 +92,6 @@ class _SandwichesScreenState extends State<SandwichesScreen> {
   void _addToCart(GeneralModels.ProductModel producto) {
     final cartService = Provider.of<CartService>(context, listen: false);
     
-    // Crear una configuración simple para el sandwich
     final configuracion = ObleaConfiguration()
       ..tipoOblea = 'Estándar'
       ..precio = producto.precioProducto
@@ -101,113 +100,190 @@ class _SandwichesScreenState extends State<SandwichesScreen> {
         'Precio': '\$${producto.precioProducto.toStringAsFixed(0)}',
       };
 
-    // Agregar al carrito
     cartService.addToCart(
       producto: producto,
       cantidad: 1,
       configuraciones: [configuracion],
     );
 
-    // Mostrar diálogo de éxito
     _showSuccessAlert(producto);
   }
 
   void _showSuccessAlert(GeneralModels.ProductModel producto) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.green[50]!, const Color.fromARGB(255, 230, 200, 227)],
+  final screenWidth = MediaQuery.of(context).size.width;
+  
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: screenWidth * 0.9,
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
+        ),
+        child: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.all((screenWidth * 0.05).clamp(16.0, 24.0)),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.green[50]!, const Color.fromARGB(255, 230, 200, 227)],
+              ),
             ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green[100],
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.shopping_cart,
-                  color: Color.fromARGB(255, 160, 67, 112),
-                  size: 40,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                '¡Éxito!',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 175, 76, 137),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Se ha añadido 1 producto al carrito',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Total: ${formatoCOP.format(producto.precioProducto)}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 175, 76, 122),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color.fromARGB(255, 175, 76, 119),
-                      side: const BorderSide(color: Color.fromARGB(255, 175, 76, 140)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    ),
-                    child: const Text('Seguir comprando'),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.green[100],
+                    shape: BoxShape.circle,
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 175, 76, 130),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    ),
-                    child: const Text('Volver al inicio'),
+                  child: Icon(
+                    Icons.shopping_cart,
+                    color: const Color.fromARGB(255, 160, 67, 112),
+                    size: (screenWidth * 0.1).clamp(30.0, 40.0),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '¡Éxito!',
+                  style: TextStyle(
+                    fontSize: (screenWidth * 0.06).clamp(18.0, 24.0),
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 175, 76, 137),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    'Se ha añadido 1 producto al carrito',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: (screenWidth * 0.04).clamp(14.0, 16.0)),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Total: ${formatoCOP.format(producto.precioProducto)}',
+                  style: TextStyle(
+                    fontSize: (screenWidth * 0.045).clamp(16.0, 18.0),
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 175, 76, 122),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                screenWidth < 360
+                    ? Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color.fromARGB(255, 175, 76, 119),
+                                side: const BorderSide(color: Color.fromARGB(255, 175, 76, 140)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              ),
+                              child: const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text('Seguir comprando'),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255, 175, 76, 130),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              ),
+                              child: const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text('Volver al inicio'),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Flexible(
+                            flex: 1,
+                            child: OutlinedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color.fromARGB(255, 175, 76, 119),
+                                side: const BorderSide(color: Color.fromARGB(255, 175, 76, 140)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                              ),
+                              child: const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'Seguir comprando',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            flex: 1,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255, 175, 76, 130),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                              ),
+                              child: const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'Volver al inicio',
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ],
+            ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildCard(GeneralModels.ProductModel producto) {
     final nombre = producto.nombreProducto;
@@ -225,15 +301,14 @@ class _SandwichesScreenState extends State<SandwichesScreen> {
           Expanded(
             flex: 3,
             child: ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               child: _buildProductImage(imagen),
             ),
           ),
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(8),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -243,48 +318,52 @@ class _SandwichesScreenState extends State<SandwichesScreen> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   if (precio > 0) ...[
                     Text(
                       '\$${precio.toStringAsFixed(0)}',
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: Colors.green,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                   ],
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton.icon(
+                    child: ElevatedButton(
                       onPressed: () => _addToCart(producto),
-                      icon: const Icon(Icons.shopping_cart, size: 16),
-                      label: const Text(
-                        'Agregar al carrito',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.pinkAccent,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 10,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        elevation: 0,
+                        minimumSize: const Size(0, 28),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_shopping_cart, size: 14),
+                          SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              'Agregar',
+                              style: TextStyle(fontSize: 11),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -400,8 +479,7 @@ class _SandwichesScreenState extends State<SandwichesScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.pinkAccent,
               foregroundColor: Colors.white,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(25),
               ),
@@ -546,7 +624,6 @@ class _SandwichesScreenState extends State<SandwichesScreen> {
                     ),
                   ),
                 ),
-                
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   padding: const EdgeInsets.all(12),
@@ -557,13 +634,13 @@ class _SandwichesScreenState extends State<SandwichesScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.shopping_cart_outlined, color: Colors.pink[700], size: 20),
+                      Icon(Icons.shopping_cart_checkout, color: Colors.pink[600], size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Haz clic en "Agregar al carrito" para añadir productos',
+                          'Haz clic en "Agregar" para añadir productos',
                           style: TextStyle(
-                            color: Colors.pink[900],
+                            color: Colors.pink[700],
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -572,7 +649,6 @@ class _SandwichesScreenState extends State<SandwichesScreen> {
                     ],
                   ),
                 ),
-                
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -590,7 +666,7 @@ class _SandwichesScreenState extends State<SandwichesScreen> {
                                 crossAxisCount: 2,
                                 crossAxisSpacing: 16,
                                 mainAxisSpacing: 16,
-                                childAspectRatio: 0.68,
+                                childAspectRatio: 0.75,
                               ),
                               itemBuilder: (context, index) {
                                 return _buildCard(filteredProductos[index]);
